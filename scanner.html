@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>FoodWise AI Scanner</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8f1;
+            color: #123d25;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 60px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .back {
+            text-decoration: none;
+            color: white;
+            background: #176b3a;
+
+            padding: 12px 22px;
+
+            border-radius: 25px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 35px;
+        }
+
+        .scanner-box {
+            background: white;
+
+            padding: 40px;
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 5px 25px rgba(0,0,0,0.1);
+        }
+
+        .camera {
+            width: 100%;
+            max-width: 600px;
+
+            height: 350px;
+
+            background: #222;
+
+            border-radius: 15px;
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+
+            font-size: 22px;
+
+            overflow: hidden;
+        }
+
+        .camera video,
+        .camera img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+        .buttons {
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 14px 25px;
+
+            margin: 8px;
+
+            border: none;
+
+            border-radius: 25px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            background: #176b3a;
+
+            color: white;
+        }
+
+        button:hover {
+            background: #0e542b;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        #result {
+
+            margin-top: 30px;
+
+            padding: 25px;
+
+            display: none;
+
+            background: #eef8e9;
+
+            border-radius: 15px;
+
+            text-align: left;
+        }
+
+        #result h2 {
+            margin-bottom: 15px;
+        }
+
+        #foodName {
+            font-size: 24px;
+            font-weight: bold;
+            color: #176b3a;
+        }
+
+        #loading {
+
+            display: none;
+
+            margin-top: 20px;
+
+            font-size: 18px;
+
+            color: #176b3a;
+        }
+
+        .error {
+            color: #c62828;
+            margin-top: 15px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div class="logo">
+        🥑 FoodWise AI
+    </div>
+
+    <a href="index.html" class="back">
+        ← Back Home
+    </a>
+
+</header>
+
+
+<div class="container">
+
+    <h1>📷 Food Scanner</h1>
+
+    <p class="subtitle">
+        Upload a food image or use your camera to identify the food using AI.
+    </p>
+
+
+    <div class="scanner-box">
+
+
+        <!-- CAMERA -->
+
+        <div class="camera" id="cameraBox">
+
+            📷 Camera / Food Image
+
+        </div>
+
+
+        <!-- BUTTONS -->
+
+        <div class="buttons">
+
+
+            <input
+                type="file"
+                id="foodImage"
+                accept="image/*"
+                hidden
+            >
+
+
+            <button
+                onclick="selectImage()">
+
+                📁 Upload Food Image
+
+            </button>
+
+
+            <button
+                onclick="openCamera()">
+
+                📷 Open Camera
+
+            </button>
+
+
+            <button
+                id="captureButton"
+                onclick="captureImage()"
+                style="display:none;">
+
+                📸 Capture Food
+
+            </button>
+
+
+            <button
+                id="scanButton"
+                onclick="scanFood()"
+                disabled>
+
+                🔍 Scan Food
+
+            </button>
+
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div id="loading">
+
+            🤖 AI is analyzing your food...
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div id="result">
+
+            <h2>🍽️ Food Result</h2>
+
+            <p id="foodName">
+                Waiting for AI result...
+            </p>
+
+            <p id="nutrition"></p>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+let selectedFile = null;
+
+let cameraStream = null;
+
+let capturedImage = null;
+
+
+
+// ================================
+// SELECT IMAGE
+// ================================
+
+function selectImage() {
+
+    document
+        .getElementById("foodImage")
+        .click();
+
+}
+
+
+
+// ================================
+// IMAGE SELECTED
+// ================================
+
+document
+.getElementById("foodImage")
+.addEventListener("change", function(event) {
+
+
+    const file = event.target.files[0];
+
+
+    if (!file) {
+        return;
+    }
+
+
+    selectedFile = file;
+
+
+    const imageURL =
+        URL.createObjectURL(file);
+
+
+    const cameraBox =
+        document.getElementById("cameraBox");
+
+
+    cameraBox.innerHTML = `
+
+        <img
+            src="${imageURL}"
+            alt="Selected food">
+
+    `;
+
+
+    document
+        .getElementById("scanButton")
+        .disabled = false;
+
+
+});
+
+
+
+// ================================
+// OPEN CAMERA
+// ================================
+
+async function openCamera() {
+
+
+    try {
+
+
+        cameraStream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video: {
+                    facingMode: "environment"
+                },
+
+                audio: false
+
+            });
+
+
+        const cameraBox =
+            document.getElementById("cameraBox");
+
+
+        cameraBox.innerHTML = "";
+
+
+        const video =
+            document.createElement("video");
+
+
+        video.id = "cameraVideo";
+
+        video.srcObject = cameraStream;
+
+        video.autoplay = true;
+
+        video.playsInline = true;
+
+
+        cameraBox.appendChild(video);
+
+
+        document
+            .getElementById("captureButton")
+            .style.display = "inline-block";
+
+
+        document
+            .getElementById("scanButton")
+            .disabled = true;
+
+
+    }
+
+    catch(error) {
+
+
+        alert(
+            "Camera access failed. Please allow camera permission."
+        );
+
+
+        console.log(error);
+
+    }
+
+}
+
+
+
+// ================================
+// CAPTURE CAMERA IMAGE
+// ================================
+
+function captureImage() {
+
+
+    const video =
+        document.getElementById("cameraVideo");
+
+
+    if (!video) {
+
+        alert("Please open the camera first.");
+
+        return;
+
+    }
+
+
+    const canvas =
+        document.createElement("canvas");
+
+
+    canvas.width = video.videoWidth;
+
+    canvas.height = video.videoHeight;
+
+
+    const context =
+        canvas.getContext("2d");
+
+
+    context.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    canvas.toBlob(function(blob) {
+
+
+        selectedFile =
+            new File(
+                [blob],
+                "camera-food.jpg",
+                {
+                    type: "image/jpeg"
+                }
+            );
+
+
+        capturedImage =
+            canvas.toDataURL("image/jpeg");
+
+
+        const cameraBox =
+            document.getElementById("cameraBox");
+
+
+        cameraBox.innerHTML = `
+
+            <img
+                src="${capturedImage}"
+                alt="Captured food">
+
+        `;
+
+
+        // Stop camera
+
+        if (cameraStream) {
+
+            cameraStream
+                .getTracks()
+                .forEach(track => track.stop());
+
+        }
+
+
+        document
+            .getElementById("captureButton")
+            .style.display = "none";
+
+
+        document
+            .getElementById("scanButton")
+            .disabled = false;
+
+
+    }, "image/jpeg");
+
+}
+
+
+
+// ================================
+// SEND IMAGE TO AI
+// ================================
+
+async function scanFood() {
+
+
+    if (!selectedFile) {
+
+        alert(
+            "Please upload or capture a food image first."
+        );
+
+        return;
+
+    }
+
+
+    const loading =
+        document.getElementById("loading");
+
+
+    const result =
+        document.getElementById("result");
+
+
+    const foodName =
+        document.getElementById("foodName");
+
+
+    const nutrition =
+        document.getElementById("nutrition");
+
+
+    loading.style.display = "block";
+
+    result.style.display = "none";
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "image",
+        selectedFile
+    );
+
+
+    try {
+
+
+        /*
+         * This sends the image to Python.
+         *
+         * Your Python app must provide:
+         *
+         * POST /predict
+         */
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:5000/predict",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Python server returned an error."
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        loading.style.display = "none";
+
+        result.style.display = "block";
+
+
+        if (data.food) {
+
+            foodName.innerText =
+                "🍽️ " + data.food;
+
+        }
+
+        else {
+
+            foodName.innerText =
+                "Food: " + (data.prediction || "Unknown");
+
+        }
+
+
+        if (data.nutrition) {
+
+            nutrition.innerText =
+                data.nutrition;
+
+        }
+
+
+    }
+
+    catch(error) {
+
+
+        loading.style.display = "none";
+
+        result.style.display = "block";
+
+
+        foodName.innerText =
+            "❌ AI connection failed";
+
+
+        nutrition.innerHTML = `
+
+            <p class="error">
+
+                Make sure your Python AI server
+                is running.
+
+                <br><br>
+
+                Error: ${error.message}
+
+            </p>
+
+        `;
+
+
+        console.log(error);
+
+    }
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

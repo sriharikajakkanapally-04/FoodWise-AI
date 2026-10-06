@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FoodWise AI</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #fffdf8;
+            color: #174c38;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        nav {
+            width: 100%;
+            height: 80px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #176b3a;
+        }
+
+        .logo span {
+            color: #66a948;
+        }
+
+        .logo-icon {
+            font-size: 42px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #263f35;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #188044;
+        }
+
+        .nav-links .active {
+            color: #188044;
+            font-weight: bold;
+            border-bottom: 3px solid #188044;
+            padding-bottom: 8px;
+        }
+
+        .scan-nav {
+            background: #238b4d;
+            color: white !important;
+            padding: 13px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 5%;
+            gap: 40px;
+            background: linear-gradient(
+                90deg,
+                #fffdf8,
+                #f5f8ee
+            );
+        }
+
+        .hero-left {
+            width: 48%;
+        }
+
+        .small-title {
+            color: #18723f;
+            letter-spacing: 3px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 62px;
+            line-height: 1.05;
+            color: #276541;
+            margin-bottom: 25px;
+        }
+
+        .hero h1 span {
+            color: #f28b16;
+        }
+
+        .hero-text {
+            font-size: 19px;
+            line-height: 1.6;
+            color: #40534c;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 16px 28px;
+            border-radius: 35px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-green {
+            background: #238b4d;
+            color: white;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #238b4d;
+            border: 2px solid #238b4d;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            transition: 0.2s;
+        }
+
+        /* ================= FOOD IMAGE ================= */
+
+        .hero-right {
+            width: 48%;
+            position: relative;
+        }
+
+        .food-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .ai-label {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: white;
+            padding: 15px 22px;
+            border-radius: 30px;
+            font-weight: bold;
+            color: #238b4d;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        /* ================= SECTION ================= */
+
+        section {
+            padding: 70px 5%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            color: #175a40;
+            margin-bottom: 45px;
+        }
+
+        .section-title span {
+            color: #f28b16;
+        }
+
+        /* ================= FEATURE CARDS ================= */
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+
+        .feature-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #e3f3d8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-bottom: 25px;
+        }
+
+        .feature-card:nth-child(2) .feature-icon {
+            background: #fff0d5;
+        }
+
+        .feature-card h3 {
+            font-size: 21px;
+            margin-bottom: 15px;
+            color: #175a40;
+        }
+
+        .feature-card p {
+            color: #5b6d65;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* ================= HOW IT WORKS ================= */
+
+        .how-section {
+            background: #fff;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .step {
+            background: white;
+            border-radius: 18px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .number {
+            position: absolute;
+            top: -15px;
+            left: 15px;
+            background: #92c86e;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-icon {
+            width: 75px;
+            height: 75px;
+            margin: 10px auto 20px;
+            background: #edf8e7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .step:nth-child(2) .step-icon,
+        .step:nth-child(4) .step-icon {
+            background: #fff0d5;
+        }
+
+        .step h3 {
+            margin-bottom: 12px;
+            color: #175a40;
+        }
+
+        .step p {
+            color: #65756e;
+            line-height: 1.5;
+        }
+
+        /* ================= CTA ================= */
+
+        .cta {
+            margin: 30px 5% 70px;
+            padding: 50px;
+            border-radius: 30px;
+            background: linear-gradient(
+                100deg,
+                #eef8dc,
+                #f9f5dc
+            );
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .cta-text {
+            max-width: 600px;
+        }
+
+        .cta h2 {
+            font-size: 36px;
+            color: #17633e;
+            margin-bottom: 15px;
+        }
+
+        .cta h2 span {
+            color: #f28b16;
+        }
+
+        .cta p {
+            color: #52665d;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .cta-food {
+            font-size: 120px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: white;
+            padding: 40px 5% 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 25px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #17633e;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: #40534c;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 900px) {
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-left,
+            .hero-right {
+                width: 100%;
+            }
+
+            .hero h1 {
+                font-size: 45px;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .cta {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            nav {
+                height: auto;
+                padding: 15px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .scan-nav {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .cta {
+                margin-left: 15px;
+                margin-right: 15px;
+            }
+
+            .footer-top {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav>
+
+        <div class="logo">
+            <div class="logo-icon">🥑</div>
+            FoodWise <span>AI</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="#" class="active">Home</a>
+
+            <a href="#scanner">
+                Food Scanner
+            </a>
+
+            <a href="#recipes">
+                Recipes
+            </a>
+
+            <a href="#about">
+                About
+            </a>
+
+            <a href="#scanner" class="scan-nav">
+                📷 Start Scanning
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero" id="about">
+
+        <div class="hero-left">
+
+            <div class="small-title">
+                AI POWERED FOOD RECOGNITION
+            </div>
+
+            <h1>
+                What's on your
+                <span>plate?</span>
+            </h1>
+
+            <p class="hero-text">
+                Identify food instantly, learn about its
+                nutrition, and discover delicious recipes
+                with AI.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="#scanner"
+                   class="btn btn-green">
+                    📷 Scan Food
+                </a>
+
+                <a href="#recipes"
+                   class="btn btn-outline">
+                    🍴 Explore Recipes
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-right">
+
+            <img
+                class="food-image"
+                src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=80"
+                alt="Healthy Food">
+
+            <div class="ai-label">
+                🧠 AI Food Recognition
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FEATURES ================= -->
+
+    <section id="scanner">
+
+        <h2 class="section-title">
+            <span>—</span>
+            Smart Food Assistant
+            <span>—</span>
+        </h2>
+
+        <div class="features">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Food Recognition
+                </h3>
+
+                <p>
+                    Upload an image or use your
+                    camera to identify food using
+                    Artificial Intelligence.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📊
+                </div>
+
+                <h3>
+                    Nutrition Insights
+                </h3>
+
+                <p>
+                    Get simple nutrition information,
+                    calories and useful health
+                    information about your food.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    👨‍🍳
+                </div>
+
+                <h3>
+                    Recipe Recommendations
+                </h3>
+
+                <p>
+                    Discover delicious recipes based
+                    on the food identified by the
+                    FoodWise AI scanner.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= HOW IT WORKS ================= -->
+
+    <section class="how-section">
+
+        <h2 class="section-title">
+            <span>—</span>
+            How FoodWise AI Works
+            <span>—</span>
+        </h2>
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="number">
+                    01
+                </div>
+
+                <div class="step-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Capture
+                </h3>
+
+                <p>
+                    Take a photo or upload
+                    an image of your food.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="number">
+                    02
+                </div>
+
+                <div class="step-icon">
+                    🧠
+                </div>
+
+                <h3>
+                    Recognize
+                </h3>
+
+                <p>
+                    Our AI identifies the
+                    food from your image.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="number">
+                    03
+                </div>
+
+                <div class="step-icon">
+                    📊
+                </div>
+
+                <h3>
+                    Get Insights
+                </h3>
+
+                <p>
+                    View nutrition facts,
+                    calories and health benefits.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="number">
+                    04
+                </div>
+
+                <div class="step-icon">
+                    👨‍🍳
+                </div>
+
+                <h3>
+                    Discover Recipes
+                </h3>
+
+                <p>
+                    Explore tasty recipes
+                    based on your food.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= CTA ================= -->
+
+    <div class="cta" id="recipes">
+
+        <div class="cta-text">
+
+            <h2>
+                Ready to discover
+                <br>
+                what's on your <span>plate?</span>
+            </h2>
+
+            <p>
+                Scan your food, get instant insights
+                and explore healthy, tasty recipes
+                with FoodWise AI.
+            </p>
+
+            <a href="#scanner"
+               class="btn btn-green">
+                📷 Start Food Scanner →
+            </a>
+
+        </div>
+
+        <div class="cta-food">
+            🥗
+        </div>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-top">
+
+            <div>
+
+                <div class="footer-logo">
+                    🥑 FoodWise AI
+                </div>
+
+                <small>
+                    Smarter Food Choices • Healthier You
+                </small>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="#">
+                    Home
+                </a>
+
+                <a href="#scanner">
+                    Food Scanner
+                </a>
+
+                <a href="#recipes">
+                    Recipes
+                </a>
+
+                <a href="#about">
+                    About
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="copyright">
+
+            © 2026 FoodWise AI. All rights reserved.
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        // Scan Food button
+
+        document.querySelectorAll('a[href="#scanner"]')
+        .forEach(function(button) {
+
+            button.addEventListener("click", function() {
+
+                alert(
+                    "Food Scanner will open here. You can connect your AI food recognition model here."
+                );
+
+            });
+
+        });
+
+
+        // Recipe button
+
+        document.querySelectorAll('a[href="#recipes"]')
+        .forEach(function(button) {
+
+            button.addEventListener("click", function() {
+
+                document.getElementById("recipes")
+                .scrollIntoView({
+                    behavior: "smooth"
+                });
+
+            });
+
+        });
+
+    </script>
+
+</body>
+</html>
